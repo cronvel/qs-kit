@@ -1,6 +1,6 @@
 {
   "name": "qs-kit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A query string manipulation toolbox.",
   "main": "lib/qs.js",
   "directories": {
@@ -22,7 +22,9 @@
     "url": "https://github.com/cronvel/qs-kit.git"
   },
   "keywords": [
-    "qs",
+    "query",
+    "string",
+    "query string",
     "manipulation"
   ],
   "author": "Cédric Ronvel",
