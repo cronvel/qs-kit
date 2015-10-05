@@ -2,7 +2,7 @@
 
 # QS Kit
 
-An query string manipulation toolbox.
+A query string manipulation toolbox.
 
 Early alpha.
 
