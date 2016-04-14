@@ -39,11 +39,37 @@ var expect = require( 'expect.js' ) ;
 
 
 
-describe( "..." , function() {
+describe( "Parse" , function() {
 	
-	it( "..." , function() {
+	it( "Scalar usage" , function() {
+		expect( qs.parse( "k=v" ) ).to.eql( { k: "v" } ) ;
+		expect( qs.parse( "key=value" ) ).to.eql( { key: "value" } ) ;
+		expect( qs.parse( "a=1" ) ).to.eql( { a: 1 } ) ;
+		expect( qs.parse( "key=value&a=1" ) ).to.eql( { key: "value" , a: 1 } ) ;
+		expect( qs.parse( "key=value&a=1&b=2&c=string" ) ).to.eql( { key: "value" , a: 1 , b: 2 , c: "string" } ) ;
 	} ) ;
 	
+	it( "String encoded" , function() {
+		expect( qs.parse( "key=some%20value" ) ).to.eql( { key: "some value" } ) ;
+	} ) ;
+} ) ;
+
+
+
+describe( "Stringify" , function() {
+	
+	it( "Scalar usage" ) ;
+	it( "String encoded" ) ;
+} ) ;
+
+
+
+describe( "Historical bugs" , function() {
+	
+	it( "Bad query string: =one=two" , function() {
+		// should throw
+		expect( function() { qs.parse( "=one=two" ) ; } ).to.throwException() ;
+	} ) ;
 } ) ;
 
 
