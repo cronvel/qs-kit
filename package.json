@@ -1,13 +1,13 @@
 {
   "name": "qs-kit",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A query string manipulation toolbox.",
   "main": "lib/qs.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "tree-kit": "^0.5.19"
+    "tree-kit": "^0.5.24"
   },
   "devDependencies": {
     "expect.js": "^0.3.1",
