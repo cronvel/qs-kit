@@ -34,5 +34,20 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cronvel/qs-kit/issues"
+  },
+  "config": {
+    "tea-time": {
+      "coverDir": [
+        "lib"
+      ]
+    }
+  },
+  "copyright": {
+    "title": "Query String Kit",
+    "years": [
+      2014,
+      2016
+    ],
+    "owner": "Cédric Ronvel"
   }
 }
