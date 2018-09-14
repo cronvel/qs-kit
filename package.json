@@ -1,6 +1,6 @@
 {
   "name": "qs-kit",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A query string manipulation toolbox.",
   "main": "lib/qs.js",
   "engines": {
@@ -10,13 +10,9 @@
     "test": "test"
   },
   "dependencies": {
-    "tree-kit": "^0.5.24"
+    "tree-kit": "^0.6.0"
   },
-  "devDependencies": {
-    "expect.js": "^0.3.1",
-    "jshint": "^2.9.1",
-    "mocha": "^2.4.5"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "tea-time -R dot"
   },
@@ -46,7 +42,7 @@
     "title": "Query String Kit",
     "years": [
       2014,
-      2016
+      2018
     ],
     "owner": "Cédric Ronvel"
   }
