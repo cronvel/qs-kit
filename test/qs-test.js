@@ -74,6 +74,8 @@ describe( "Parse" , () => {
 		options = { keyPath: true } ;
 		expect( qs.parse( "a.b=val" ) ).to.equal( { "a.b": 'val' } ) ;
 		expect( qs.parse( "a.b=val" , options ) ).to.equal( { a: { b: 'val' } } ) ;
+		expect( qs.parse( "a.b=val&a.c=ue" , options ) ).to.equal( { a: { b: 'val' , c: 'ue' } } ) ;
+		expect( qs.parse( "a.b=val&c.d=ue" , options ) ).to.equal( { a: { b: 'val' } , c: { d: 'ue' } } ) ;
 	} ) ;
 	
 	it( "'keyPath' and 'autoPush' option" , () => {
