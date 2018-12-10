@@ -48,12 +48,19 @@ describe( "Parse" , () => {
 		expect( qs.parse( "key=value&a=1&b=2&c=string" ) ).to.equal( { key: "value" , a: "1" , b: "2" , c: "string" } ) ;
 	} ) ;
 	
+	it( "'autoNumber' option" , () => {
+		var options = { autoNumber: true } ;
+		expect( qs.parse( "a=10&b=20&c=string" , options ) ).to.equal( { a: 10 , b: 20 , c: "string" } ) ;
+		expect( qs.parse( "a=1&b=-2&c=12.345&d=-123.45" , options ) ).to.equal( { a: 1 , b: -2 , c: 12.345 , d: -123.45 } ) ;
+		expect( qs.parse( "a=10ab&b=2a" , options ) ).to.equal( { a: "10ab" , b: "2a" } ) ;
+	} ) ;
+	
 	it( "String encoded" , () => {
 		expect( qs.parse( "key=some%20value" ) ).to.equal( { key: "some value" } ) ;
 	} ) ;
 	
 	it( "Array 'autoPush' option" , () => {
-		options = { autoPush: true } ;
+		var options = { autoPush: true } ;
 		expect( qs.parse( "key=one&key=two&key=three" ) ).to.equal( { key: 'three' } ) ;
 		expect( qs.parse( "key=one&key=two&key=three" , options ) ).to.equal( { key: [ 'one' , 'two' , 'three' ] } ) ;
 	} ) ;
@@ -65,13 +72,13 @@ describe( "Parse" , () => {
 	} ) ;
 	
 	it( "Array 'keyPath' option" , () => {
-		options = { keyPath: true } ;
+		var options = { keyPath: true } ;
 		expect( qs.parse( "a[0]=val&a[1]=val2" ) ).to.equal( { "a[0]": 'val' , "a[1]": 'val2' } ) ;
 		expect( qs.parse( "a[0]=val&a[1]=val2" , options ) ).to.equal( { a: [ 'val' , 'val2' ] } ) ;
 	} ) ;
 	
 	it( "Object 'keyPath' option" , () => {
-		options = { keyPath: true } ;
+		var options = { keyPath: true } ;
 		expect( qs.parse( "a.b=val" ) ).to.equal( { "a.b": 'val' } ) ;
 		expect( qs.parse( "a.b=val" , options ) ).to.equal( { a: { b: 'val' } } ) ;
 		expect( qs.parse( "a.b=val&a.c=ue" , options ) ).to.equal( { a: { b: 'val' , c: 'ue' } } ) ;
@@ -83,6 +90,12 @@ describe( "Parse" , () => {
 		expect( qs.parse( "a.b=val&a.b=val2" , { keyPath: true } ) ).to.equal( { a: { b: "val2" } } ) ;
 		expect( qs.parse( "a.b=val&a.b=val2" , { autoPush: true } ) ).to.equal( { "a.b": [ "val" , "val2" ] } ) ;
 		expect( qs.parse( "a.b=val&a.b=val2" , { keyPath: true , autoPush: true } ) ).to.equal( { a: { b: [ "val" , "val2" ] } } ) ;
+	} ) ;
+
+	it( "'restQueryFilter' option" , () => {
+		var options = { restQueryFilter: true , autoNumber: true } ;
+		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { "path.to.prop": "value" } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 } } ) ;
 	} ) ;
 } ) ;
 
@@ -108,8 +121,4 @@ describe( "Historical bugs" , () => {
 		expect( () => qs.parse( "=one=two" ) ).to.throw() ;
 	} ) ;
 } ) ;
-
-
-
-
 
