@@ -96,12 +96,16 @@ describe( "Parse" , () => {
 		var options = { restQueryFilter: true , autoNumber: true } ;
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { "path.to.prop": "value" } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 } } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } ) ;
 	} ) ;
 
 	it( "'restQueryFilter' option with a string should nest those filters" , () => {
 		var options = { restQueryFilter: 'filter' , autoNumber: true } ;
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { filter: { "path.to.prop": "value" } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 } } } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } } } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } } ) ;
 	} ) ;
 } ) ;
 
