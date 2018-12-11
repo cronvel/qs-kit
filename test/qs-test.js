@@ -97,6 +97,12 @@ describe( "Parse" , () => {
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { "path.to.prop": "value" } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 } } ) ;
 	} ) ;
+
+	it( "'restQueryFilter' option with a string should nest those filters" , () => {
+		var options = { restQueryFilter: 'filter' , autoNumber: true } ;
+		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { filter: { "path.to.prop": "value" } } ) ;
+		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 } } } ) ;
+	} ) ;
 } ) ;
 
 
