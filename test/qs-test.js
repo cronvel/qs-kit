@@ -94,18 +94,37 @@ describe( "Parse" , () => {
 
 	it( "'restQueryFilter' option" , () => {
 		var options = { restQueryFilter: true , autoNumber: true } ;
+		expect( qs.parse( ".prop=value" , options ) ).to.equal( { prop: "value" } ) ;
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { "path.to.prop": "value" } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } ) ;
 	} ) ;
 
-	it( "'restQueryFilter' option with a string should nest those filters" , () => {
-		var options = { restQueryFilter: 'filter' , autoNumber: true } ;
+	it( "'restQueryFilter' option set to a string should use it as the property which the filters will be nested into" , () => {
+		var value , encoded ,
+			options = { restQueryFilter: 'filter' , autoNumber: true } ;
+		
+		expect( qs.parse( ".prop=value" , options ) ).to.equal( { filter: { prop: "value" } } ) ;
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { filter: { "path.to.prop": "value" } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 } } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } } ) ;
+		
+		value = "éµ%!:&=?#«»" ;
+		encoded = encodeURIComponent( value ) ;
+		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+
+		value = "إختبار" ;
+		encoded = encodeURIComponent( value ) ;
+		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+
+		value = "测试" ;
+		encoded = encodeURIComponent( value ) ;
+		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
 	} ) ;
 } ) ;
 
@@ -120,6 +139,18 @@ describe( "Stringify" , () => {
 	
 	it( "Scalar" ) ;
 	it( "String encoded" ) ;
+} ) ;
+
+
+
+describe( "encodeURIComponent" , () => {
+
+	it( "should encode all QS Kit special characters" , () => {
+		expect( encodeURIComponent( "=" ) ).to.be( "%3D" ) ;
+		expect( encodeURIComponent( "&" ) ).to.be( "%26" ) ;
+		expect( encodeURIComponent( "[]" ) ).to.be( "%5B%5D" ) ;
+		expect( encodeURIComponent( "," ) ).to.be( "%2C" ) ;
+	} ) ;
 } ) ;
 
 
