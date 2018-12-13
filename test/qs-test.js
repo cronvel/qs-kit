@@ -101,6 +101,12 @@ describe( "Parse" , () => {
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } ) ;
 	} ) ;
 
+	it( "the '+' chars should be translated to spaces" , () => {
+		expect( qs.parse( "search=some+keywords+with+space" ) ).to.equal( { search: "some keywords with space" } ) ;
+		expect( qs.parse( "some+prop=value" ) ).to.equal( { "some prop": "value" } ) ;
+		expect( qs.parse( "some+prop=some+keywords+with+space" ) ).to.equal( { "some prop": "some keywords with space" } ) ;
+	} ) ;
+
 	it( "'restQueryFilter' option set to a string should use it as the property which the filters will be nested into" , () => {
 		var value , encoded ,
 			options = { restQueryFilter: 'filter' , autoNumber: true } ;
@@ -111,6 +117,7 @@ describe( "Parse" , () => {
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } } ) ;
 		
+		// Historical bug: URI encodinig was not working with the 'restQueryFilter' option
 		value = "éµ%!:&=?#«»" ;
 		encoded = encodeURIComponent( value ) ;
 		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
