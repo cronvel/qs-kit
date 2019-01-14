@@ -92,6 +92,12 @@ describe( "Parse" , () => {
 		expect( qs.parse( "a.b=val&a.b=val2" , { keyPath: true , autoPush: true } ) ).to.equal( { a: { b: [ "val" , "val2" ] } } ) ;
 	} ) ;
 
+	it( "the '+' chars should be translated to spaces" , () => {
+		expect( qs.parse( "search=some+keywords+with+space" ) ).to.equal( { search: "some keywords with space" } ) ;
+		expect( qs.parse( "some+prop=value" ) ).to.equal( { "some prop": "value" } ) ;
+		expect( qs.parse( "some+prop=some+keywords+with+space" ) ).to.equal( { "some prop": "some keywords with space" } ) ;
+	} ) ;
+
 	it( "'restQueryFilter' option" , () => {
 		var options = { restQueryFilter: true , autoNumber: true } ;
 		expect( qs.parse( ".prop=value" , options ) ).to.equal( { prop: "value" } ) ;
@@ -101,10 +107,11 @@ describe( "Parse" , () => {
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } ) ;
 	} ) ;
 
-	it( "the '+' chars should be translated to spaces" , () => {
-		expect( qs.parse( "search=some+keywords+with+space" ) ).to.equal( { search: "some keywords with space" } ) ;
-		expect( qs.parse( "some+prop=value" ) ).to.equal( { "some prop": "value" } ) ;
-		expect( qs.parse( "some+prop=some+keywords+with+space" ) ).to.equal( { "some prop": "some keywords with space" } ) ;
+	it( "mixing 'restQueryFilter' and 'brackets' options" , () => {
+		var options = { restQueryFilter: true , brackets: true , autoNumber: true } ;
+		expect( qs.parse( ".prop=[one,two,three]" , options ) ).to.equal( { prop: [ 'one' , 'two' , 'three' ] } ) ;
+		expect( qs.parse( ".path.to.prop=[one,two,three]" , options ) ).to.equal( { "path.to.prop": [ 'one' , 'two' , 'three' ] } ) ;
+		expect( qs.parse( ".path.to.prop.$in=[one,two,three]" , options ) ).to.equal( { "path.to.prop": { $in: [ 'one' , 'two' , 'three' ] } } ) ;
 	} ) ;
 
 	it( "'restQueryFilter' option set to a string should use it as the property which the filters will be nested into" , () => {
