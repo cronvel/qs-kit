@@ -1,6 +1,6 @@
 {
   "name": "qs-kit",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "A query string manipulation toolbox.",
   "main": "lib/qs.js",
   "engines": {
@@ -10,9 +10,8 @@
     "test": "test"
   },
   "dependencies": {
-    "tree-kit": "^0.6.2"
+    "tree-kit": "^0.7.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "tea-time -R dot"
   },
