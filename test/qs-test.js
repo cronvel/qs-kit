@@ -54,6 +54,24 @@ describe( "Parse" , () => {
 		expect( qs.parse( "a=1&b=-2&c=12.345&d=-123.45" , options ) ).to.equal( { a: 1 , b: -2 , c: 12.345 , d: -123.45 } ) ;
 		expect( qs.parse( "a=10ab&b=2a" , options ) ).to.equal( { a: "10ab" , b: "2a" } ) ;
 	} ) ;
+
+	it( "'autoNumber' option should be non-destructive: if there are leading zero, keep the value as a string" , () => {
+		var options = { autoNumber: true } ;
+		expect( qs.parse( "a=0&b=0.1&c=0.01&d=0.0100&e=1000&f=100.000&g=0.0&h=01&i=0017&j=0017.010&k=00&l=00.1" , options ) ).to.equal( {
+			a: 0 ,
+			b: 0.1 ,
+			c: 0.01 ,
+			d: 0.01 ,
+			e: 1000 ,
+			f: 100 ,
+			g: 0 ,
+			h: "01" ,
+			i: "0017" ,
+			j: "0017.010" ,
+			k: "00" ,
+			l: "00.1"
+		} ) ;
+	} ) ;
 	
 	it( "String encoded" , () => {
 		expect( qs.parse( "key=some%20value" ) ).to.equal( { key: "some value" } ) ;
