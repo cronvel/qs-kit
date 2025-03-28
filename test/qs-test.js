@@ -24,11 +24,10 @@
 	SOFTWARE.
 */
 
-/* jshint unused:false */
 /* global describe, it, before, after */
 
 
-var qs = require( '../lib/qs.js' ) ;
+const qs = require( '..' ) ;
 
 
 
@@ -116,25 +115,9 @@ describe( "Parse" , () => {
 		expect( qs.parse( "some+prop=some+keywords+with+space" ) ).to.equal( { "some prop": "some keywords with space" } ) ;
 	} ) ;
 
-	it( "'restQueryFilter' option" , () => {
-		var options = { restQueryFilter: true , autoNumber: true } ;
-		expect( qs.parse( ".prop=value" , options ) ).to.equal( { prop: "value" } ) ;
-		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { "path.to.prop": "value" } ) ;
-		expect( qs.parse( ".path.to.prop.$lt=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 } } ) ;
-		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } } ) ;
-		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } ) ;
-	} ) ;
-
-	it( "mixing 'restQueryFilter' and 'brackets' options" , () => {
-		var options = { restQueryFilter: true , brackets: true , autoNumber: true } ;
-		expect( qs.parse( ".prop=[one,two,three]" , options ) ).to.equal( { prop: [ 'one' , 'two' , 'three' ] } ) ;
-		expect( qs.parse( ".path.to.prop=[one,two,three]" , options ) ).to.equal( { "path.to.prop": [ 'one' , 'two' , 'three' ] } ) ;
-		expect( qs.parse( ".path.to.prop.$in=[one,two,three]" , options ) ).to.equal( { "path.to.prop": { $in: [ 'one' , 'two' , 'three' ] } } ) ;
-	} ) ;
-
-	it( "'restQueryFilter' option set to a string should use it as the property which the filters will be nested into" , () => {
+	it( "when 'restQueryFlatPrefixes' option set, some parts of the key are considered flat, and moved inside a sub-object" , () => {
 		var value , encoded ,
-			options = { restQueryFilter: 'filter' , autoNumber: true } ;
+			options = { restQueryFlatPrefixes: { "filter.": "filter" , ".": "filter" , "sort.": "sort" } , autoNumber: true } ;
 		
 		expect( qs.parse( ".prop=value" , options ) ).to.equal( { filter: { prop: "value" } } ) ;
 		expect( qs.parse( ".path.to.prop=value" , options ) ).to.equal( { filter: { "path.to.prop": "value" } } ) ;
@@ -142,21 +125,49 @@ describe( "Parse" , () => {
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } } } ) ;
 		expect( qs.parse( ".path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } } ) ;
 		
+		expect( qs.parse( "filter.prop=value" , options ) ).to.equal( { filter: { prop: "value" } } ) ;
+		expect( qs.parse( "filter.path.to.prop=value" , options ) ).to.equal( { filter: { "path.to.prop": "value" } } ) ;
+		expect( qs.parse( "filter.path.to.prop.$lt=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 } } } ) ;
+		expect( qs.parse( "filter.path.to.prop.$lt=10&.path.to.prop.$gt=5" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } } } ) ;
+		expect( qs.parse( "filter.path.to.prop.$lt=10&.path.to.prop.$gt=5&.path.to.prop2.$ne=10" , options ) ).to.equal( { filter: { "path.to.prop": { $lt: 10 , $gt: 5 } , "path.to.prop2": { $ne: 10 } } } ) ;
+		
+		expect( qs.parse( "sort.prop=1" , options ) ).to.equal( { sort: { prop: 1 } } ) ;
+		expect( qs.parse( "sort.path.to.prop=-1" , options ) ).to.equal( { sort: { "path.to.prop": -1 } } ) ;
+		
+
 		// Historical bug: URI encodinig was not working with the 'restQueryFilter' option
 		value = "éµ%!:&=?#«»" ;
 		encoded = encodeURIComponent( value ) ;
 		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
 		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+		expect( qs.parse( "filter.prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( "filter.path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
 
 		value = "إختبار" ;
 		encoded = encodeURIComponent( value ) ;
 		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
 		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+		expect( qs.parse( "filter.prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( "filter.path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
 
 		value = "测试" ;
 		encoded = encodeURIComponent( value ) ;
 		expect( qs.parse( ".prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
 		expect( qs.parse( ".path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+		expect( qs.parse( "filter.prop=" + encoded , options ) ).to.equal( { filter: { prop: value } } ) ;
+		expect( qs.parse( "filter.path.to.prop=" + encoded , options ) ).to.equal( { filter: { "path.to.prop": value } } ) ;
+	} ) ;
+
+	it( "mixing 'restQueryFlatPrefixes' and 'brackets' options" , () => {
+		var options = { restQueryFlatPrefixes: { "filter.": "filter" , ".": "filter" , "sort.": "sort" } , brackets: true , autoNumber: true } ;
+
+		expect( qs.parse( ".prop=[one,two,three]" , options ) ).to.equal( { filter: { prop: [ 'one' , 'two' , 'three' ] } } ) ;
+		expect( qs.parse( ".path.to.prop=[one,two,three]" , options ) ).to.equal( { filter: { "path.to.prop": [ 'one' , 'two' , 'three' ] } } ) ;
+		expect( qs.parse( ".path.to.prop.$in=[one,two,three]" , options ) ).to.equal( { filter: { "path.to.prop": { $in: [ 'one' , 'two' , 'three' ] } } } ) ;
+
+		expect( qs.parse( "filter.prop=[one,two,three]" , options ) ).to.equal( { filter: { prop: [ 'one' , 'two' , 'three' ] } } ) ;
+		expect( qs.parse( "filter.path.to.prop=[one,two,three]" , options ) ).to.equal( { filter: { "path.to.prop": [ 'one' , 'two' , 'three' ] } } ) ;
+		expect( qs.parse( "filter.path.to.prop.$in=[one,two,three]" , options ) ).to.equal( { filter: { "path.to.prop": { $in: [ 'one' , 'two' , 'three' ] } } } ) ;
 	} ) ;
 } ) ;
 
@@ -165,8 +176,16 @@ describe( "Parse" , () => {
 describe( "Stringify" , () => {
 	
 	it( "should stringify an object" , () => {
-		var object = { firstName: "Joe" , lastName: "Doe" } ;
-		expect( qs.stringify( object ) ).to.be( "firstName=Joe&lastName=Doe" ) ;
+		expect( qs.stringify( { firstName: "Joe" , lastName: "Doe" } ) ).to.be( "firstName=Joe&lastName=Doe" ) ;
+		expect( qs.stringify( { sub: { firstName: "Joe" , lastName: "Doe" } } ) ).to.be( "sub.firstName=Joe&sub.lastName=Doe" ) ;
+		expect( qs.stringify( { sub: { friends: ["Joe","Jane","Jack"] } } ) ).to.be( "sub.friends[0]=Joe&sub.friends[1]=Jane&sub.friends[2]=Jack" ) ;
+
+		// 'brackets' option
+		expect( qs.stringify( { sub: { friends: ["Joe","Jane","Jack"] } } , { brackets: true } ) ).to.be( "sub.friends=[Joe,Jane,Jack]" ) ;
+
+		// URL-encode
+		expect( qs.stringify( { name: "Joe Doe" } ) ).to.be( "name=Joe%20Doe" ) ;
+		expect( qs.stringify( { "its name": "Joe Doe" } ) ).to.be( "its%20name=Joe%20Doe" ) ;
 	} ) ;
 	
 	it( "Scalar" ) ;
